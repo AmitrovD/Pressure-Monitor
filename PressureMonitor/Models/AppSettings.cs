@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PressureMonitor.Models
+﻿namespace PressureMonitor.Models
 {
     public class AppSettings
     {
-        public GenerationType SelectedType { get; set; }
-        public double? StaticValue { get; set; }
-        public double? RandomValue { get; set; }
-        public double? LinearStartValue { get; set; }
-        public double? LinearStep {  get; set; }
-        public PressureDirections SelectedDirection { get; set; }
+        public GenerationType SelectedType { get; set; } = GenerationType.Static;
+        public double? StaticValue { get; set; } = 25.5;
+        public double? RandomValue { get; set; } = 250;
+        public double? LinearStartValue { get; set; } = 0;
+        public double? LinearStep { get; set; } = 1;
+        public PressureDirections SelectedDirection { get; set; } = PressureDirections.Up;
     }
 }

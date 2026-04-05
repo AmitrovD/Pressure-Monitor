@@ -6,7 +6,6 @@ using PressureMonitor.Services;
 using PressureMonitor.Views;
 using PressureMonitor.Helpers;
 using OxyPlot;
-using System.Windows.Media.Media3D;
 
 namespace PressureMonitor.ViewModels
 {
@@ -92,7 +91,6 @@ namespace PressureMonitor.ViewModels
             _emulation.StopGeneration();
 
             var points = Сhart.GetPoints();
-            MessageBox.Show($"Точек для сохранения: {points.Count}");
 
             var trial = new Trial
             {

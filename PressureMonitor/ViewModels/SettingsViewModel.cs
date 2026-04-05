@@ -1,14 +1,7 @@
 ﻿using PressureMonitor.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 
 namespace PressureMonitor.ViewModels
 {
@@ -17,10 +10,10 @@ namespace PressureMonitor.ViewModels
         private GenerationType _selectedType;
         private PressureDirections _direction;
         private string _textBoxValue = string.Empty;
-        private string _staticLimit = "100";
-        private string _linearStartValue = "0";
-        private string _linearStep = "1";
-        private string _randomLimit = "150";
+        private string _staticLimit;
+        private string _linearStartValue;
+        private string _linearStep;
+        private string _randomLimit;
         private readonly AppSettings _appSettings = new();
 
         public event Action<GenerationType>? SelectedTypeChanged;
@@ -166,10 +159,10 @@ namespace PressureMonitor.ViewModels
         public void ApplyFrom(AppSettings settings)
         {
             SelectedType = settings.SelectedType;
-            StaticValue = settings.StaticValue.ToString();
-            RandomValue = settings.RandomValue.ToString();
-            LinearStartValue = settings.LinearStartValue.ToString();
-            LinearStep = settings.LinearStep.ToString();
+            StaticValue = (settings.StaticValue ?? 100).ToString();
+            RandomValue = (settings.RandomValue ?? 150).ToString();
+            LinearStartValue = (settings.LinearStartValue ?? 0).ToString();
+            LinearStep = (settings.LinearStep ?? 1).ToString();
             SelectedDirection = settings.SelectedDirection;
         }
 

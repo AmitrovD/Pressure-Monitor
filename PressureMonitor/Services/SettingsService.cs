@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PressureMonitor.Models;
 using System.IO;
-using Microsoft.Extensions.Logging;
 using System.Windows;
 
 namespace PressureMonitor.Services
