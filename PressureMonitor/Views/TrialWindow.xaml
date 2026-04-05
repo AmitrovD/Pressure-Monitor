@@ -21,7 +21,9 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8">
             <ComboBox Width="150" Margin="0,0,8,0"
                   ItemsSource="{Binding SortDirectionsOptions}"
-                  SelectedItem="{Binding SelectedSortDirections}"/>
+                  SelectedValue="{Binding SelectedSortDirections}" 
+                  SelectedValuePath="Key" 
+                  DisplayMemberPath="Value"/>
             <Button Content="Сортировать" Width="100"
                 Command="{Binding SortCommand}"/>
         </StackPanel>

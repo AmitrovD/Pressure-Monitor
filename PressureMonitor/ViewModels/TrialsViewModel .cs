@@ -1,17 +1,11 @@
 ﻿using PressureMonitor.Helpers;
 using PressureMonitor.Models;
 using PressureMonitor.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Xml.Serialization;
 
 namespace PressureMonitor.ViewModels
 {
@@ -19,7 +13,7 @@ namespace PressureMonitor.ViewModels
     {
         private readonly DatabaseService _db;
         private List<Trial> _allTrials = new();
-        private SortDirections _sortDirection;
+        private SortDirections _sortDirection = SortDirections.Newest;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -82,8 +76,11 @@ namespace PressureMonitor.ViewModels
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
-        public IEnumerable<SortDirections> SortDirectionsOptions =>
-            Enum.GetValues(typeof(SortDirections)).Cast<SortDirections>();
+        public Dictionary<SortDirections, string> SortDirectionsOptions { get; } = new()
+        {
+            { SortDirections.Newest, "Сначала новые" },
+            { SortDirections.Oldest, "Сначала старые" }
+        };
         public void OnPropertyChanged([CallerMemberName] string prop = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }
