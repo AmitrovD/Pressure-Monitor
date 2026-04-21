@@ -1,5 +1,6 @@
 ﻿using PressureMonitor.Models;
 using System.ComponentModel;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
@@ -15,6 +16,9 @@ namespace PressureMonitor.ViewModels
         private string _linearStep;
         private string _randomLimit;
         private readonly AppSettings _appSettings = new();
+        private string _ipAddress = "127.0.0.1";
+        private string _port = "502";
+        private string _slaveId = "1";
 
         public event Action<GenerationType>? SelectedTypeChanged;
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,6 +50,24 @@ namespace PressureMonitor.ViewModels
                 OnPropertyChanged(nameof(IsValueValid));
             }
         }
+        public string IpAddress
+        {
+            get => _ipAddress;
+            set { _ipAddress = value; OnPropertyChanged(); SettingsChanged?.Invoke(); }
+        }
+
+        public string Port
+        {
+            get => _port;
+            set { _port = value; OnPropertyChanged(); SettingsChanged?.Invoke(); }
+        }
+
+        public string SlaveId
+        {
+            get => _slaveId;
+            set { _slaveId = value; OnPropertyChanged(); SettingsChanged?.Invoke(); }
+        }
+
         private bool IsValueValid =>
             double.TryParse(TextBoxValue, out double result) && result >= 0;
 
@@ -164,6 +186,19 @@ namespace PressureMonitor.ViewModels
             LinearStartValue = (settings.LinearStartValue ?? 0).ToString();
             LinearStep = (settings.LinearStep ?? 1).ToString();
             SelectedDirection = settings.SelectedDirection;
+        }
+        public ModbusSettings GetModbusSettings()
+        {
+            var settings = new ModbusSettings();
+            settings.IpAddress = IpAddress;
+
+            if (int.TryParse(Port, out int port))
+                settings.Port = port;
+
+            if (byte.TryParse(SlaveId, out byte slaveId))
+                settings.SlaveId = slaveId;
+
+            return settings;
         }
 
     }
