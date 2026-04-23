@@ -6,6 +6,7 @@ using PressureMonitor.Services;
 using PressureMonitor.Views;
 using PressureMonitor.Helpers;
 using OxyPlot;
+using System.Runtime.CompilerServices;
 
 namespace PressureMonitor.ViewModels
 {
@@ -14,6 +15,20 @@ namespace PressureMonitor.ViewModels
         private readonly EmulationService _emulation;
         private readonly SettingsService _settingsService;
         private readonly DatabaseService _databaseService;
+        private readonly ModbusService _modbusService = new();
+        private int _secondsElapsed = 0;
+
+        private double _maxValue = double.MinValue;
+        private double _minValue = double.MaxValue;
+        private double _sumValue = 0;
+        private int _pointsCount = 0;
+
+        private string _maxDisplay = "—";
+        private string _minDisplay = "—";
+        private string _avgDisplay = "—";
+        private string _connectionStatusText = "Отключено";
+        private string _connectionStatusColor = "Red";
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public SettingsViewModel Settings { get; }
         public ICommand OpenSettingsCommand { get; }
@@ -24,6 +39,11 @@ namespace PressureMonitor.ViewModels
         public PressureChartModel Сhart { get; }
         public Action<Action<Point, double, Point, double, double>>? RequestSettingsButtonPosition { get; set; }
 
+        public string MaxDisplay { get => _maxDisplay; set { _maxDisplay = value; OnPropertyChanged(); } }
+        public string MinDisplay { get => _minDisplay; set { _minDisplay = value; OnPropertyChanged(); } }
+        public string AvgDisplay { get => _avgDisplay; set { _avgDisplay = value; OnPropertyChanged(); } }
+        public string ConnectionStatusText { get => _connectionStatusText; set { _connectionStatusText = value; OnPropertyChanged(); } }
+        public string ConnectionStatusColor { get => _connectionStatusColor; set { _connectionStatusColor = value; OnPropertyChanged(); } }
         public MainViewModel()
         {
             _emulation = new EmulationService();
@@ -43,11 +63,64 @@ namespace PressureMonitor.ViewModels
 
             _emulation.OnDataGenerated += HandleNewPoint;
             Settings.SettingsChanged += () => _settingsService.Save(Settings.ToAppSettings());
+            _modbusService.OnValueReceived += HandleModbusValue;
+            _modbusService.OnStatusChanged += HandleStatusChanged;
         }
-        private void Start()
+        private void HandleModbusValue(double value)
+        {
+            if (value > _maxValue) _maxValue = value;
+            if (value < _minValue) _minValue = value;
+            _sumValue += value;
+            _pointsCount++;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                MaxDisplay = $"Макс: {_maxValue:F2}";
+                MinDisplay = $"Мин: {_minValue:F2}";
+                AvgDisplay = $"Среднее: {(_sumValue / _pointsCount):F2}";
+
+                Сhart.AddPoint(_secondsElapsed, value);
+                _secondsElapsed++;
+            });
+        }
+
+        private void HandleStatusChanged(ConnectionStatus status)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (status == ConnectionStatus.Connected)
+                {
+                    ConnectionStatusText = "Подключено";
+                    ConnectionStatusColor = "Green";
+                }
+                else if (status == ConnectionStatus.Disconnected)
+                {
+                    ConnectionStatusText = "Отключено";
+                    ConnectionStatusColor = "Red";
+                }
+                else if (status == ConnectionStatus.Timeout)
+                {
+                    ConnectionStatusText = "Таймаут";
+                    ConnectionStatusColor = "Orange";
+                }
+                else
+                {
+                    ConnectionStatusText = "Ошибка";
+                    ConnectionStatusColor = "Red";
+                }
+            });
+        }
+        private async void Start()
         {
             Сhart.Clear();
-            double limit = 100;
+            _secondsElapsed = 0;
+            _maxValue = double.MinValue;
+            _minValue = double.MaxValue;
+            _sumValue = 0;
+            _pointsCount = 0;
+            MaxDisplay = "—";
+            MinDisplay = "—";
+            AvgDisplay = "—";
             switch (Settings.SelectedType)
             {
 
@@ -60,7 +133,7 @@ namespace PressureMonitor.ViewModels
                         break;
                     }
                     _emulation.SetStrategy(new StaticPressureStrategy());
-                    limit = staticLimit.Value;
+                    _emulation.StartGeneration(staticLimit.Value);
                     break;
                 case GenerationType.Linear:
                     var startValue = Settings.GetTextBoxValue(Settings.LinearStartValue);
@@ -72,25 +145,27 @@ namespace PressureMonitor.ViewModels
                         break;
                     }
                     _emulation.SetStrategy(new LinearPressureStrategy((double)startValue, (double)step, Settings.SelectedDirection));
+                    _emulation.StartGeneration(0);
                     break;
-                case GenerationType.Random:
-                    var randomLimit = Settings.GetTextBoxValue(Settings.StaticValue);
-
-                    if (!randomLimit.HasValue)
-                    {
-                        MessageBox.Show("Значения были введены неправильно!");
-                    }
-                    _emulation.SetStrategy(new RandomPressureStrategy());
-                    limit = randomLimit.Value;
+                case GenerationType.Modbus:
+                    var modbusSettings = Settings.GetModbusSettings();
+                    _modbusService.SetSettings(modbusSettings);
+                    await _modbusService.StartAsync(Settings.GetRegisterAddress()); // ← адрес из настроек
                     break;
             }
-            _emulation.StartGeneration(limit);
         }
         private void Stop()
         {
             _emulation.StopGeneration();
+            _modbusService.Stop();
 
             var points = Сhart.GetPoints();
+
+            if (points.Count == 0)
+            {
+                MessageBox.Show("Нет данных для сохранения");
+                return;
+            }
 
             var trial = new Trial
             {
@@ -164,5 +239,10 @@ namespace PressureMonitor.ViewModels
             window.ShowDialog();
         }
 
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
     }
 }

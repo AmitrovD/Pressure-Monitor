@@ -41,14 +41,14 @@ namespace PressureMonitor.Services
         {
             try
             {
+                _logger.LogInformation("Попытка подключения к {Ip}:{Port} SlaveId={SlaveId}",
+                    _settings.IpAddress, _settings.Port, _settings.SlaveId);
+
                 if (_tcpClient != null)
                 {
                     _tcpClient.Close();
                     _tcpClient = null;
                 }
-
-                _logger.LogInformation("Подключение к {Ip}:{Port}",
-                _settings.IpAddress, _settings.Port);
 
                 _tcpClient = new TcpClient();
                 var connected = _tcpClient.ConnectAsync(_settings.IpAddress, _settings.Port)
@@ -56,6 +56,8 @@ namespace PressureMonitor.Services
 
                 if (!connected)
                 {
+                    _logger.LogWarning("Таймаут подключения к {Ip}:{Port}",
+                        _settings.IpAddress, _settings.Port);
                     OnStatusChanged?.Invoke(ConnectionStatus.Timeout);
                     return false;
                 }
@@ -66,16 +68,23 @@ namespace PressureMonitor.Services
                 _master.Transport.WriteTimeout = 2000;
 
                 _reconnectAttempts = 0;
+                _logger.LogInformation("Успешно подключено к {Ip}:{Port}",
+                    _settings.IpAddress, _settings.Port);
                 OnStatusChanged?.Invoke(ConnectionStatus.Connected);
-
-                _logger.LogInformation("Успешно подключено");
                 return true;
+            }
+            catch (SocketException ex)
+            {
+                _logger.LogError("Сетевая ошибка подключения: {Message} (код {ErrorCode})",
+                    ex.Message, ex.ErrorCode);
+                OnStatusChanged?.Invoke(ConnectionStatus.Error);
+                return false;
             }
             catch (Exception ex)
             {
+                _logger.LogError("Неизвестная ошибка подключения: {Type} — {Message}",
+                    ex.GetType().Name, ex.Message);
                 OnStatusChanged?.Invoke(ConnectionStatus.Error);
-                _logger.LogError(ex, "Ошибка подключения к {Ip}:{Port}",
-                _settings.IpAddress, _settings.Port);
                 return false;
             }
         }
@@ -85,6 +94,7 @@ namespace PressureMonitor.Services
                 return;
 
             _isRunning = true;
+            _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
             if (!TryConnect())
@@ -127,7 +137,14 @@ namespace PressureMonitor.Services
                         _tcpClient = null;
                     }
 
-                    await Task.Delay(_settings.PollingInterval, _cts.Token);
+                    try
+                    {
+                        await Task.Delay(_settings.PollingInterval, _cts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
             }, _cts.Token);
         }
@@ -156,6 +173,24 @@ namespace PressureMonitor.Services
             }
 
             OnStatusChanged?.Invoke(ConnectionStatus.Disconnected);
+        }
+        private void LogReadError(Exception ex, ushort registerAddress)
+        {
+            if (ex is SocketException socketEx)
+            {
+                _logger.LogError("Потеряно соединение при чтении регистра {Addr}: {Message}",
+                    registerAddress, socketEx.Message);
+            }
+            else if (ex is InvalidOperationException)
+            {
+                _logger.LogError("Modbus ошибка протокола при чтении регистра {Addr}: {Message}",
+                    registerAddress, ex.Message);
+            }
+            else
+            {
+                _logger.LogError("Ошибка чтения регистра {Addr}: {Type} — {Message}",
+                    registerAddress, ex.GetType().Name, ex.Message);
+            }
         }
     }
 }

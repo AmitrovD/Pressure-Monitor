@@ -12,7 +12,9 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
@@ -20,7 +22,18 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
-            
+
+        <StackPanel Orientation="Horizontal" 
+                    Grid.Row="0" Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Margin="5,5,0,5">
+        <Ellipse Width="12" Height="12" Margin="0,0,5,0"
+                     VerticalAlignment="Center"
+                     Fill="{Binding ConnectionStatusColor}"/>
+        <TextBlock Text="{Binding ConnectionStatusText}"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
         <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Right"
                     Grid.Row="0" Grid.Column="1">
@@ -36,11 +49,19 @@
                     Command="{Binding OpenTrialCommand}"/>
         </StackPanel>
         
-        <oxy:PlotView Model="{Binding Сhart.PlotModel}" Grid.Row="0" Grid.Column="0"/>
+        <oxy:PlotView Model="{Binding Сhart.PlotModel}" Grid.Row="1" Grid.Column="0"/>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="2" Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Margin="5,4,0,4">
+            <TextBlock Text="{Binding MaxDisplay}" Margin="0,0,15,0"/>
+            <TextBlock Text="{Binding MinDisplay}" Margin="0,0,15,0"/>
+            <TextBlock Text="{Binding AvgDisplay}"/>
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Grid.Row="1" Margin="0,8,0,0">
+                    Grid.Row="3" Margin="0,8,0,0">
             <Button Content="Старт" 
                     Width="90" Height="30"
                     Margin="0,0,5,10"

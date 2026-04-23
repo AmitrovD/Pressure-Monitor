@@ -4,113 +4,117 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:conv="clr-namespace:PressureMonitor.Converters"
-        xmlns:model="clr-namespace:PressureMonitor.Models"
         mc:Ignorable="d"
-        Title="Settings" Height="160" Width="320"
-        >
-    <Window.Resources> 
+        Title="Settings" Height="280" Width="400"
+        WindowStartupLocation="Manual">
+    <Window.Resources>
         <conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
-            <ColumnDefinition Width="70"/>
-            <ColumnDefinition Width="70"/>
-            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="90"/>
         </Grid.ColumnDefinitions>
 
-
-        <RadioButton GroupName="GenerationStrategy" Content="Static" Grid.Column="0" Grid.Row="0"
+        <RadioButton GroupName="GenerationStrategy" Content="Static"
+                     Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"
                      IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Static}"/>
-        <RadioButton GroupName="GenerationStrategy" Content="Random" Grid.Column="0" Grid.Row="1"
-                     IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Random}"/>
-        <RadioButton GroupName="GenerationStrategy" Content="Linear" Grid.Column="0" Grid.Row="2"
+        <TextBox Grid.Column="1" Grid.Row="0"
+                 Visibility="{Binding StaticVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 ToolTip="Введите уровень статического давления">
+            <TextBox.Text>
+                <Binding Path="StaticValue" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <conv:PositiveNumberRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <RadioButton GroupName="GenerationStrategy" Content="Modbus"
+                     Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
+                     IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Modbus}"/>
+
+        <TextBlock Text="IP:" Grid.Column="0" Grid.Row="2"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="IP адрес Modbus устройства"/>
+
+        <TextBlock Text="Port:" Grid.Column="0" Grid.Row="3"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="3"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Порт, обычно 502"/>
+
+        <TextBlock Text="Slave ID:" Grid.Column="0" Grid.Row="4"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="4"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Идентификатор устройства"/>
+
+        <TextBlock Text="Регистр:" Grid.Column="0" Grid.Row="5"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="5"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding RegisterAddress, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Адрес регистра для чтения давления"/>
+
+        <RadioButton GroupName="GenerationStrategy" Content="Linear"
+                     Grid.Column="0" Grid.Row="6" VerticalAlignment="Center"
                      IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Linear}"/>
-
-        <TextBox x:Name="StaticTextBox"
-         Grid.Column="1"
-         Grid.Row="0"
-         FontSize="18"
-         Visibility="{Binding StaticVisibility}"
-         ToolTip="Введите уровень статического давления">
-
+        <TextBox Grid.Column="1" Grid.Row="6"
+                 Visibility="{Binding LinearVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 ToolTip="Шаг изменения давления">
             <TextBox.Text>
-                <Binding Path="StaticValue"
-                 UpdateSourceTrigger="PropertyChanged">
+                <Binding Path="LinearStartValue" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
-                        <conv:PositiveNumberRule />
+                        <conv:PositiveNumberRule/>
                     </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
-
         </TextBox>
-
-        <TextBox x:Name="RandomTextBox"
-         Grid.Column="1"
-         Grid.Row="1"
-         FontSize="18"
-         Visibility="{Binding RandomVisibility}"
-         ToolTip="Введите лимит случайного давления">
-
+        <TextBox Grid.Column="2" Grid.Row="6"
+                 Visibility="{Binding LinearVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 ToolTip="Начальное значение давления">
             <TextBox.Text>
-                <Binding Path="RandomValue"
-                 UpdateSourceTrigger="PropertyChanged">
+                <Binding Path="LinearStep" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
-                        <conv:PositiveNumberRule />
+                        <conv:PositiveNumberRule/>
                     </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
-
         </TextBox>
-
-        <TextBox x:Name="LinearStepTextBox"
-         Grid.Column="1"
-         Grid.Row="2"
-         FontSize="18"
-         Visibility="{Binding LinearVisibility}"
-         ToolTip="Введите шаг изменения уровня давления">
-
-            <TextBox.Text>
-                <Binding Path="LinearStartValue"
-                 UpdateSourceTrigger="PropertyChanged">
-                    <Binding.ValidationRules>
-                        <conv:PositiveNumberRule />
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-
-        </TextBox>
-
-        <TextBox x:Name="LinearStartTextBox"
-         Grid.Column="2"
-         Grid.Row="2"
-         FontSize="18"
-         Visibility="{Binding LinearVisibility}"
-         ToolTip="Введите изначальный уровень давления">
-
-            <TextBox.Text>
-                <Binding Path="LinearStep"
-                 UpdateSourceTrigger="PropertyChanged">
-                    <Binding.ValidationRules>
-                        <conv:PositiveNumberRule />
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-
-        </TextBox>
-
-        <ComboBox Grid.Column="3" Grid.Row="2"
+        <ComboBox Grid.Column="3" Grid.Row="6"
                   Visibility="{Binding DirectionVisibility}"
-                  ItemsSource="{Binding PressureDirections}" 
+                  VerticalAlignment="Center" Height="22"
+                  ItemsSource="{Binding PressureDirections}"
                   SelectedItem="{Binding SelectedDirection}"
-                  ToolTip="Выберите направление изменения давления"
-                  />
-
+                  ToolTip="Направление изменения давления"/>
     </Grid>
 </Window>

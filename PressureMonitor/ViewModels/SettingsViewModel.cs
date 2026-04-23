@@ -15,6 +15,7 @@ namespace PressureMonitor.ViewModels
         private string _linearStartValue;
         private string _linearStep;
         private string _randomLimit;
+        private string _registerAddress = "0";
         private readonly AppSettings _appSettings = new();
         private string _ipAddress = "127.0.0.1";
         private string _port = "502";
@@ -80,7 +81,7 @@ namespace PressureMonitor.ViewModels
 
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(StaticVisibility));
-                OnPropertyChanged(nameof(RandomVisibility));
+                OnPropertyChanged(nameof(ModbusVisibility));
                 OnPropertyChanged(nameof(LinearVisibility));
                 OnPropertyChanged(nameof(DirectionVisibility));
                 SelectedTypeChanged?.Invoke(_selectedType);
@@ -108,8 +109,8 @@ namespace PressureMonitor.ViewModels
         public Visibility StaticVisibility =>
             SelectedType == GenerationType.Static ? Visibility.Visible : Visibility.Collapsed;
 
-        public Visibility RandomVisibility =>
-            SelectedType == GenerationType.Random ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ModbusVisibility =>
+            SelectedType == GenerationType.Modbus ? Visibility.Visible : Visibility.Collapsed;
 
         public Visibility LinearVisibility =>
             SelectedType == GenerationType.Linear ? Visibility.Visible : Visibility.Collapsed;
@@ -200,6 +201,16 @@ namespace PressureMonitor.ViewModels
 
             return settings;
         }
-
+        public string RegisterAddress
+        {
+            get => _registerAddress;
+            set { _registerAddress = value; OnPropertyChanged(); SettingsChanged?.Invoke(); }
+        }
+        public ushort GetRegisterAddress()
+        {
+            if (ushort.TryParse(RegisterAddress, out ushort address))
+                return address;
+            return 0;
+        }
     }
 }

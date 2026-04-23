@@ -4,6 +4,6 @@
     {
         Static,
         Linear,
-        Random
+        Modbus
     }
 }

@@ -17,6 +17,9 @@ namespace PressureMonitor.Helpers
                 builder.SetMinimumLevel(LogLevel.Debug);
                 builder.AddDebug(); 
             });
+            var testLogger = _factory.CreateLogger("Test");
+            testLogger.LogInformation("Логгер инициализирован!");
+            System.Windows.MessageBox.Show("Логгер создан");
         }
         public static ILogger<T> CreateLogger<T>()
         {
