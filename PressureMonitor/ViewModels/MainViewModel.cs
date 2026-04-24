@@ -150,7 +150,7 @@ namespace PressureMonitor.ViewModels
                 case GenerationType.Modbus:
                     var modbusSettings = Settings.GetModbusSettings();
                     _modbusService.SetSettings(modbusSettings);
-                    await _modbusService.StartAsync(Settings.GetRegisterAddress()); // ← адрес из настроек
+                    await _modbusService.StartAsync(Settings.GetRegisterAddress());
                     break;
             }
         }

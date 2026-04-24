@@ -43,53 +43,13 @@
             </TextBox.Text>
         </TextBox>
 
-        <RadioButton GroupName="GenerationStrategy" Content="Modbus"
-                     Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
-                     IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Modbus}"/>
-
-        <TextBlock Text="IP:" Grid.Column="0" Grid.Row="2"
-                   Visibility="{Binding ModbusVisibility}"
-                   VerticalAlignment="Center" Margin="5,0,0,0"/>
-        <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3"
-                 Visibility="{Binding ModbusVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="IP адрес Modbus устройства"/>
-
-        <TextBlock Text="Port:" Grid.Column="0" Grid.Row="3"
-                   Visibility="{Binding ModbusVisibility}"
-                   VerticalAlignment="Center" Margin="5,0,0,0"/>
-        <TextBox Grid.Column="1" Grid.Row="3"
-                 Visibility="{Binding ModbusVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Порт, обычно 502"/>
-
-        <TextBlock Text="Slave ID:" Grid.Column="0" Grid.Row="4"
-                   Visibility="{Binding ModbusVisibility}"
-                   VerticalAlignment="Center" Margin="5,0,0,0"/>
-        <TextBox Grid.Column="1" Grid.Row="4"
-                 Visibility="{Binding ModbusVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Идентификатор устройства"/>
-
-        <TextBlock Text="Регистр:" Grid.Column="0" Grid.Row="5"
-                   Visibility="{Binding ModbusVisibility}"
-                   VerticalAlignment="Center" Margin="5,0,0,0"/>
-        <TextBox Grid.Column="1" Grid.Row="5"
-                 Visibility="{Binding ModbusVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 Text="{Binding RegisterAddress, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Адрес регистра для чтения давления"/>
-
         <RadioButton GroupName="GenerationStrategy" Content="Linear"
-                     Grid.Column="0" Grid.Row="6" VerticalAlignment="Center"
-                     IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Linear}"/>
-        <TextBox Grid.Column="1" Grid.Row="6"
-                 Visibility="{Binding LinearVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 ToolTip="Шаг изменения давления">
+                 Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
+                 IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Linear}"/>
+        <TextBox Grid.Column="1" Grid.Row="1"
+             Visibility="{Binding LinearVisibility}"
+             VerticalAlignment="Center" Height="22"
+             ToolTip="Шаг изменения давления">
             <TextBox.Text>
                 <Binding Path="LinearStartValue" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -98,10 +58,10 @@
                 </Binding>
             </TextBox.Text>
         </TextBox>
-        <TextBox Grid.Column="2" Grid.Row="6"
-                 Visibility="{Binding LinearVisibility}"
-                 VerticalAlignment="Center" Height="22"
-                 ToolTip="Начальное значение давления">
+        <TextBox Grid.Column="2" Grid.Row="1"
+             Visibility="{Binding LinearVisibility}"
+             VerticalAlignment="Center" Height="22"
+             ToolTip="Начальное значение давления">
             <TextBox.Text>
                 <Binding Path="LinearStep" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -110,11 +70,52 @@
                 </Binding>
             </TextBox.Text>
         </TextBox>
-        <ComboBox Grid.Column="3" Grid.Row="6"
-                  Visibility="{Binding DirectionVisibility}"
-                  VerticalAlignment="Center" Height="22"
-                  ItemsSource="{Binding PressureDirections}"
-                  SelectedItem="{Binding SelectedDirection}"
-                  ToolTip="Направление изменения давления"/>
+        <ComboBox Grid.Column="3" Grid.Row="1"
+              Visibility="{Binding DirectionVisibility}"
+              VerticalAlignment="Center" Height="22"
+              ItemsSource="{Binding PressureDirections}"
+              SelectedItem="{Binding SelectedDirection}"
+              ToolTip="Направление изменения давления"/>
+
+        <RadioButton GroupName="GenerationStrategy" Content="Modbus"
+                     Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"
+                     IsChecked="{Binding SelectedType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Modbus}"/>
+
+        <TextBlock Text="IP:" Grid.Column="0" Grid.Row="3"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="IP адрес Modbus устройства"/>
+
+        <TextBlock Text="Port:" Grid.Column="0" Grid.Row="4"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="4"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Порт, обычно 502"/>
+
+        <TextBlock Text="Slave ID:" Grid.Column="0" Grid.Row="5"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="5"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Идентификатор устройства"/>
+
+        <TextBlock Text="Регистр:" Grid.Column="0" Grid.Row="6"
+                   Visibility="{Binding ModbusVisibility}"
+                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+        <TextBox Grid.Column="1" Grid.Row="6"
+                 Visibility="{Binding ModbusVisibility}"
+                 VerticalAlignment="Center" Height="22"
+                 Text="{Binding RegisterAddress, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Адрес регистра для чтения давления"/>
+
     </Grid>
 </Window>

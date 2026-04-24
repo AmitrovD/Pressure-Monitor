@@ -19,7 +19,6 @@ namespace PressureMonitor.Helpers
             });
             var testLogger = _factory.CreateLogger("Test");
             testLogger.LogInformation("Логгер инициализирован!");
-            System.Windows.MessageBox.Show("Логгер создан");
         }
         public static ILogger<T> CreateLogger<T>()
         {
